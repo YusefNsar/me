@@ -1,1 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
+
+
+$bg-color: #02010D;
+
+body {
+  // overflow: hidden;
+  margin: 0;
+}
+
+.main {
+  background-color: $bg-color;
+  width: 100vw;
+  height: 100vh;
+}
