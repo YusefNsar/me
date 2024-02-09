@@ -53,12 +53,14 @@
                   "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "externalDependencies": ["three/examples/jsm/*"]
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "externalDependencies": ["three/examples/jsm/*"]
             }
           },
           "defaultConfiguration": "production"

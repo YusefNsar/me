@@ -1,4 +1,12 @@
-import { AfterRenderRef, AfterViewInit, Component, ElementRef, OnInit, ViewChild, afterNextRender } from '@angular/core';
+import {
+  AfterRenderRef,
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  afterNextRender,
+} from '@angular/core';
 import { ThreeObjectsService } from '../three-objects.service';
 
 @Component({
@@ -6,22 +14,21 @@ import { ThreeObjectsService } from '../three-objects.service';
   standalone: true,
   imports: [],
   templateUrl: './three-js.component.html',
-  styleUrl: './three-js.component.scss'
+  styleUrl: './three-js.component.scss',
 })
 export class ThreeJsComponent {
   @ViewChild('rendererContainer') rendererContainer: ElementRef | undefined;
 
   constructor(private th3: ThreeObjectsService) {
     afterNextRender(() => {
-      console.log('sdfds')
-      this.runThreeJS()
-    })
+      console.log('sdfds');
+      this.runThreeJS();
+    });
   }
 
   runThreeJS(): void {
-
     if (!this.rendererContainer) return;
 
-    this.th3.activeScene(this.rendererContainer)
+    this.th3.activeScene(this.rendererContainer);
   }
 }
