@@ -5,16 +5,24 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 // import { OrbitControls } from './three-js/utils/OrbitControls';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 // import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
+import Stats from 'three/examples/jsm/libs/stats.module';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThreeObjectsService {
+  private cameraFov: number = 60;
+  private cameraNear: number = 0.1;
+  private cameraFar: number = 1000;
+
   private container: ElementRef | undefined;
   private camera: THREE.PerspectiveCamera;
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
+  private control: TransformControls;
+  private stats: Stats;
 
   constructor() {}
 
@@ -30,16 +38,17 @@ export class ThreeObjectsService {
 
     // camera
     this.camera = new THREE.PerspectiveCamera(
-      60,
+      this.cameraFov,
       window.innerWidth / window.innerHeight,
-      0.1,
-      100,
+      this.cameraNear,
+      this.cameraFar,
     );
-    this.camera.position.set(0, 0, 4);
+    this.camera.position.set(0, 0, 10);
+    // this.camera.lookAt(0, 0, 0);
 
     // scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0xaaaaa9);
+    this.scene.background = new THREE.Color(0x000000);
 
     // renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -49,15 +58,34 @@ export class ThreeObjectsService {
     this.container?.nativeElement.appendChild(this.renderer.domElement);
 
     /* LIGHTING */
-    const ambient = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 0.3);
+    const ambient = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 0.2);
     const light = new THREE.DirectionalLight();
-    light.position.set(0.2, 1, 1);
+    light.position.set(5, 5, 5);
 
     this.scene.add(ambient);
     this.scene.add(light);
 
-    /* CONTROL */
-    const controls = new OrbitControls(this.camera, this.renderer.domElement);
+    /* HELPERS */
+    const orbit = new OrbitControls(this.camera, this.renderer.domElement);
+    // this.control = new TransformControls(this.camera, this.renderer.domElement);
+
+    // this.control.addEventListener('dragging-changed', function (event) {
+    //   orbit.enabled = !event.value;
+    // });
+    // this.scene.add(this.control);
+    // this.control.attach(light);
+
+    this.scene.add(new THREE.AxesHelper(100));
+    // this.scene.add(new THREE.CameraHelper(this.camera));
+    this.scene.add(new THREE.GridHelper(49, 49));
+    // this.scene.add(new THREE.DirectionalLightHelper(light, 5));
+    // this.scene.add(new THREE.HemisphereLightHelper(ambient, 5));
+
+    // this.scene.add(new THREE.PointLightHelper(pointLight, 1));
+    // this.scene.add(new THREE.SpotLightHelper(spotLight));
+
+    this.stats = new Stats();
+    document.body.appendChild(this.stats.dom);
 
     /* WINDOW */
     window.addEventListener('resize', () => {
@@ -67,36 +95,6 @@ export class ThreeObjectsService {
     });
   }
 
-  displayCube() {
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      60,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000,
-    );
-
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    this.container?.nativeElement.appendChild(renderer.domElement);
-
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
-
-    camera.position.z = 4;
-
-    const animate = () => {
-      requestAnimationFrame(animate);
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    };
-
-    animate();
-  }
-
   displayCube2() {
     /* COMPONENTS */
     // const geometry = new THREE.CircleGeometry(1, 32, 0, 2* Math.PI)
@@ -104,12 +102,20 @@ export class ThreeObjectsService {
     const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
     const mesh = new THREE.Mesh(geometry, material);
 
-    this.scene.add(mesh);
+    this.loadGLTF().then((glt) => {
+      glt.scene.scale.set(0.5, 0.5, 0.5);
+      glt.scene.rotateY(-Math.PI / 2);
+      // glt.scene.position.set(10, 10, 10);
+      this.scene.add(glt.scene);
+    });
+
+    // this.scene.add(mesh);
 
     // animation
     this.renderer.setAnimationLoop(() => {
       mesh.rotateY(0.01);
       mesh.rotateX(0.001);
+      this.stats.update();
       this.renderer.render(this.scene, this.camera);
     });
   }
@@ -146,8 +152,8 @@ export class ThreeObjectsService {
 
     loader.setDRACOLoader(dracoLoader);
 
-    return loader.loadAsync('robotic_eye.glb', (e) => {
-      console.log(e.loaded / e.total);
+    return loader.loadAsync('/core_from_portal_2.glb', (e) => {
+      console.log('asdfsafa', e.loaded / e.total);
     });
   }
 
@@ -172,4 +178,8 @@ export class ThreeObjectsService {
       },
     );
   }
+
+  // startCameraAnimation() {
+  //   setInterval();
+  // }
 }
