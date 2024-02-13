@@ -77,7 +77,7 @@ export class ThreeObjectsService {
     this.printCameraStats();
     setTimeout(() => this.printCameraStats(), 4000);
     this.fillSceneWithParticles(100);
-    this.makeGround();
+    this.makeGroundShards();
 
     /* HELPERS */
 
@@ -242,11 +242,171 @@ export class ThreeObjectsService {
   }
 
   makeGround() {
-    const geometry = new THREE.BoxGeometry(500, 10, 500, 32, 32);
+    const geometry = new THREE.BoxGeometry(1000, 10, 1000, 32, 32);
     const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const ground = new THREE.Mesh(geometry, material);
     ground.position.set(0, -500, 0);
+
     this.scene.add(ground);
+  }
+
+  makeGroundShards() {
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load('/assets/shardsMaterial.jpg');
+
+    let x = -500;
+    const y = -500;
+    let z = -500;
+
+    // Define vertex shader
+    const vertexShader = `
+      varying vec2 vUv;
+      varying vec2 pos;
+
+      void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          pos = vec2(position.x, position.y);
+      }
+    `;
+
+    /* varying vec2 vUv;
+      void main() {
+          vec2 grid = abs(fract(vUv * 10.0) - 0.5);
+          float intensity = smoothstep(0.45, 0.5, grid.x) * smoothstep(0.45, 0.5, grid.y);
+          gl_FragColor = vec4(intensity, intensity, intensity, 1.0);
+      } */
+
+    // Define fragment shader
+    const fragmentShader = `
+      uniform vec3      iResolution;           // viewport resolution (in pixels)
+      uniform float     iTime;                 // shader playback time (in seconds)
+      varying vec2 vUv;
+      varying vec2 pos;
+
+      vec4 background_color = vec4( 0.0, 0.0, 0.0, 1.0 );
+      vec4 line_color = vec4( 0.0, 1.0, 1.0, 1.0 );
+      float line_freq = 5.0;
+      float height = 0.5;
+      float speed = 0.8;
+      vec2 scale = vec2( -1.0, 12.0 );
+
+      void main()
+      {
+          vec2 uv = vUv * scale;
+          float shift = cos( floor( uv.y ) );
+          uv.x += shift;
+
+          float freq = clamp( cos( uv.x * line_freq ) * 3.0, 0.0, 1.0 ) * height;
+          float line = 1.0 - clamp( abs( freq - mod( uv.y, 1.0 ) ) * 11.0, 0.0, 1.0 );
+
+          gl_FragColor = mix( background_color, line_color, line * mod( uv.x - iTime * speed * abs( shift ), 1.0 ) /*  * mod( TIME + shift, 1.0 ) */ );
+      }
+    `;
+
+    const uniforms = {
+      iResolution: {
+        value: new THREE.Vector2(window.innerWidth, window.innerHeight),
+      },
+      iTime: { value: 0 },
+    };
+
+    // const material = new THREE.MeshStandardMaterial({
+    //   color: [0xffffff, 0x942341, 0x979014, 0x78e945][
+    //     Math.floor(Math.random() * 4)
+    //   ],
+    //   roughness: 0.4,
+    //   metalness: 0.8,
+    //   // map: texture,
+    //   // normalMap: texture,
+    // });
+
+    // material.onBeforeCompile = (shader) => {
+    //   shader.uniforms['iTime'] = { value: 0 };
+
+    //   console.log(shader.vertexShader);
+    //   console.log(shader.fragmentShader);
+
+    //   shader.vertexShader =
+    //     'varying vec2 vUv;\nvarying vec2 pos;\n' + shader.vertexShader;
+    //   (shader.vertexShader =
+    //     shader.vertexShader.slice(0, shader.vertexShader.length - 2) +
+    //     [
+    //       `vUv = uv;`,
+    //       'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
+    //       'pos = vec2(position.x, position.y);',
+    //     ].join('\n')),
+    //     +'\n}';
+
+    //   shader.fragmentShader =
+    //     [
+    //       `uniform vec3      iResolution;           // viewport resolution (in pixels)`,
+    //       `uniform float     iTime;                 // shader playback time (in seconds)`,
+    //       `varying vec2 vUv;`,
+    //       `varying vec2 pos;`,
+    //       `vec4 line_color = vec4( 0.0, 1.0, 1.0, 1.0 );`,
+    //       `float line_freq = 5.0;`,
+    //       `float height = 0.5;`,
+    //       `float speed = 0.8;`,
+    //       `vec2 scale = vec2( -1.0, 12.0 );\n`,
+    //     ].join('\n') + shader.fragmentShader;
+
+    //   shader.fragmentShader =
+    //     shader.fragmentShader.slice(0, shader.fragmentShader.length - 2) +
+    //     [
+    //       'vec2 uv = vUv * scale;',
+    //       'float shift = cos( floor( uv.y ) );',
+    //       'uv.x += shift;',
+    //       'float freq = clamp( cos( uv.x * line_freq ) * 3.0, 0.0, 1.0 ) * height;',
+    //       'float line = 1.0 - clamp( abs( freq - mod( uv.y, 1.0 ) ) * 11.0, 0.0, 1.0 );',
+    //       'gl_FragColor = mix( background_color, line_color, line * mod( uv.x - iTime * speed * abs( shift ), 1.0 ) /*  * mod( TIME + shift, 1.0 ) */ );',
+    //     ].join('\n') +
+    //     '\n}';
+
+    //   setInterval(() => {
+    //     shader.uniforms['iTime'].value += 0.02;
+    //   }, 20);
+    // };
+
+    const material = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms,
+    });
+
+    setInterval(() => {
+      material.uniforms['iTime'].value += 0.02;
+    }, 20);
+
+    while (z < 500) {
+      while (x < 500) {
+        const ground = new THREE.Mesh(
+          new THREE.BoxGeometry(150, 4, 75),
+          // new THREE.MeshStandardMaterial({
+          //   // color: [0xffffff, 0x942341, 0x979014, 0x78e945][
+          //   //   Math.floor(Math.random() * 4)
+          //   // ],s
+          //   roughness: 0.4,
+          //   metalness: 0.8,
+          //   map: texture,
+          //   // normalMap: texture,
+          // }),
+
+          material,
+        );
+
+        ground.name = 'shard';
+
+        ground.position.set(x, y, z);
+
+        this.scene.add(ground);
+
+        x += 150 + 10;
+      }
+
+      x = -500;
+      z += 75 + 5;
+    }
   }
 
   printCameraStats() {
@@ -358,8 +518,10 @@ export class ThreeObjectsService {
         y: -47.07,
         z: 11.64,
         ease: 'power2.out',
-        duration: 2.5,
-        delay: 0.5,
+        // duration: 2.5,
+        duration: 0.5,
+        // delay: 0.5,
+        // delay: 0,
       },
       '<',
     );
@@ -371,7 +533,8 @@ export class ThreeObjectsService {
         y: 0.02,
         z: 0.16,
         ease: 'power2.out',
-        duration: 2.8,
+        // duration: 2.8,
+        duration: 0.8,
         onUpdate: () => {
           if (this.bot) {
             this.bot.lookAt(this.camera.position);
