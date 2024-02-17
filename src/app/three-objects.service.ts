@@ -286,9 +286,9 @@ export class ThreeObjectsService {
 
       vec4 background_color = vec4( 0.0, 0.0, 0.0, 1.0 );
       vec4 line_color = vec4( 0.0, 1.0, 1.0, 1.0 );
-      float line_freq = 5.0;
+      float line_freq = 10.0;
       float height = 0.5;
-      float speed = 0.8;
+      float speed = 1.4;
       vec2 scale = vec2( -1.0, 12.0 );
 
       void main()

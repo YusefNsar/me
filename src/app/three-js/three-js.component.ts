@@ -1,13 +1,10 @@
+import { Renderer } from './threeJSRunners/renderer';
 import {
-  AfterRenderRef,
-  AfterViewInit,
   Component,
   ElementRef,
-  OnInit,
   ViewChild,
   afterNextRender,
 } from '@angular/core';
-import { ThreeObjectsService } from '../three-objects.service';
 
 @Component({
   selector: 'app-three-js',
@@ -19,9 +16,8 @@ import { ThreeObjectsService } from '../three-objects.service';
 export class ThreeJsComponent {
   @ViewChild('rendererContainer') rendererContainer: ElementRef | undefined;
 
-  constructor(private th3: ThreeObjectsService) {
+  constructor() {
     afterNextRender(() => {
-      console.log('sdfds');
       this.runThreeJS();
     });
   }
@@ -29,6 +25,7 @@ export class ThreeJsComponent {
   runThreeJS(): void {
     if (!this.rendererContainer) return;
 
-    this.th3.activeScene(this.rendererContainer);
+    const renderer = new Renderer(this.rendererContainer);
+    renderer.startAnimationLoop();
   }
 }
