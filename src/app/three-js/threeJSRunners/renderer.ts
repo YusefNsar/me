@@ -59,6 +59,8 @@ export class Renderer {
       botPos,
       botLookAtCamera,
     );
+
+    this.animator.start();
   }
 
   private handleWindowResizing() {

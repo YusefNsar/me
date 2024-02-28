@@ -8,7 +8,9 @@ export class GsapAnimatorService {
     private cameraRotation: THREE.Euler,
     private botPos: THREE.Vector3,
     private botLookAtCamera: () => void,
-  ) {
+  ) {}
+
+  start() {
     this.lookAway();
     this.lookAwayLeft();
     this.goDownWithBot();
@@ -47,12 +49,6 @@ export class GsapAnimatorService {
         // duration: 2.8,
         duration: 0.8,
         onUpdate: this.botLookAtCamera,
-        // onUpdate: () => {
-        //   this.botLookAtCamera();
-        //   // if (this.bot) {
-        //   //   this.bot.lookAt(this.cameraPos);
-        //   // }
-        // },
       },
       '<',
     );
