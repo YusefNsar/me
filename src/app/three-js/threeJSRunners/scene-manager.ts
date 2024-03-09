@@ -48,8 +48,6 @@ export class SceneManager {
   }
 
   initHelpers() {
-    // const orbit = new OrbitControls(this.camera, this.renderer.domElement);
-    // controls.addEventListener('change', () => this.printCameraStats());
     // this.control = new TransformControls(this.camera, this.renderer.domElement);
 
     // this.control.addEventListener('dragging-changed', function (event) {

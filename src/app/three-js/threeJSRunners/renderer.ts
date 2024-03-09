@@ -4,6 +4,7 @@ import { SceneManager } from './scene-manager';
 import { FlyControls } from 'three/examples/jsm/controls/FlyControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { GsapAnimatorService } from './gsap-animator';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // control Three renderer and all dom related events & logic
 export class Renderer {
@@ -60,7 +61,7 @@ export class Renderer {
       botLookAtCamera,
     );
 
-    this.animator.start();
+    // this.animator.start();
   }
 
   private handleWindowResizing() {
@@ -72,18 +73,28 @@ export class Renderer {
   }
 
   private addControls() {
+    const orbit = new OrbitControls(
+      this.sceneManager.camera,
+      this.renderer.domElement,
+    );
+    orbit.addEventListener('change', () =>
+      this.sceneManager.printCameraStats(),
+    );
+
     const controls = new FlyControls(
       this.sceneManager.camera,
       this.renderer.domElement,
     );
     controls.movementSpeed = 150;
-    controls.rollSpeed = Math.PI / 16;
+    controls.rollSpeed = Math.PI / 60;
     controls.autoForward = false;
     controls.dragToLook = true;
 
-    controls.addEventListener('change', () =>
-      this.sceneManager.printCameraStats(),
-    );
+    // controls.addEventListener('change', () => {
+    // this.sceneManager.printCameraStats();
+    // const cp = this.sceneManager.camera.position;
+    // orbit.target.set(cp.x, cp.y, cp.z);
+    // });
 
     this.controls = controls;
 
