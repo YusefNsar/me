@@ -26,7 +26,7 @@ export class SceneManager {
       cameraNear,
       cameraFar,
     );
-    this.camera.position.set(0, 0, 10);
+    this.hotReloadCamera();
     // this.camera.position.set(-50, 0, 80);
     // this.camera.lookAt(0, 0, 0);
   }
@@ -78,10 +78,43 @@ export class SceneManager {
     console.log(`pos: (${px}, ${py}, ${pz})`);
     console.log(`rot: (${rx}, ${ry}, ${rz})`);
   }
+
+  hotReloadCamera() {
+    const cameraParams = localStorage.getItem('camera');
+
+    if (!cameraParams) {
+      this.camera.position.set(0, 0, 10);
+      setInterval(() => this.saveCameraParams(), 1000);
+      return;
+    }
+
+    const camParams = JSON.parse(cameraParams) as CameraSave;
+    this.camera.position.set(...camParams.pos);
+    this.camera.rotation.set(...camParams.rot);
+
+    setInterval(() => this.saveCameraParams(), 1000);
+  }
+
+  saveCameraParams() {
+    const cp = this.camera.position;
+    const cr = this.camera.rotation;
+
+    const params: CameraSave = {
+      pos: [cp.x, cp.y, cp.z],
+      rot: [cr.x, cr.y, cr.z],
+    };
+
+    localStorage.setItem('camera', JSON.stringify(params));
+  }
 }
 
 export interface SceneElement {
   addElement(scene: THREE.Scene): void;
+}
+
+export interface CameraSave {
+  pos: THREE.Vector3Tuple;
+  rot: THREE.Vector3Tuple;
 }
 
 export interface Shader extends THREE.ShaderMaterialParameters {}
