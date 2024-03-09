@@ -19,7 +19,7 @@ export class Bot implements SceneElement {
     this.loadBotGLTF().then((glt) => {
       glt.scene.scale.set(0.5, 0.5, 0.5);
       glt.scene.rotateY(-Math.PI / 2);
-      // glt.scene.position.set(10, 10, 10);
+      glt.scene.position.set(0, 0, 20);
       glt.scene.up.set(0, 1, 0);
 
       this.botContainer.add(glt.scene);

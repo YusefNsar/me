@@ -32,10 +32,18 @@ export class Renderer {
 
   startAnimationLoop() {
     const clock = new THREE.Clock();
+    const oct = this.sceneManager.scene.getObjectByName('oct');
+    const cam = this.sceneManager.scene.getObjectByName(
+      'oct-cubecam',
+    ) as THREE.CubeCamera;
 
     this.renderer.setAnimationLoop(() => {
       this.stats.update();
       this.controls.update(clock.getDelta());
+
+      // oct!.visible = false;
+      cam!.update(this.renderer, this.sceneManager.scene);
+      // oct!.visible = true;
 
       this.renderer.render(this.sceneManager.scene, this.sceneManager.camera);
     });

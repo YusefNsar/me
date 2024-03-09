@@ -3,6 +3,7 @@ import { Lights } from './sceneElements/Lights';
 import { Bot } from './sceneElements/Bot';
 import { Particles } from './sceneElements/Particles';
 import { GroundShards } from './sceneElements/GroundShards';
+import { Octahedron } from './sceneElements/Octahedron';
 
 export class SceneManager {
   public camera: THREE.PerspectiveCamera;
@@ -18,7 +19,7 @@ export class SceneManager {
   initCamera() {
     const cameraFov = 75;
     const cameraNear = 0.1;
-    const cameraFar = 1000;
+    const cameraFar = 2000;
 
     this.camera = new THREE.PerspectiveCamera(
       cameraFov,
@@ -42,6 +43,7 @@ export class SceneManager {
       new Bot(),
       new Particles(),
       new GroundShards(),
+      new Octahedron(),
     ];
 
     elements.forEach((ele) => ele.addElement(this.scene));
