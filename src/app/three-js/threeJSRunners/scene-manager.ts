@@ -4,6 +4,7 @@ import { Bot } from './sceneElements/Bot';
 import { Particles } from './sceneElements/Particles';
 import { GroundShards } from './sceneElements/GroundShards';
 import { Octahedron } from './sceneElements/Octahedron';
+import { BeamRings } from './sceneElements/BeamRings';
 
 export class SceneManager {
   public camera: THREE.PerspectiveCamera;
@@ -44,6 +45,7 @@ export class SceneManager {
       new Particles(),
       new GroundShards(),
       new Octahedron(),
+      new BeamRings(),
     ];
 
     elements.forEach((ele) => ele.addElement(this.scene));

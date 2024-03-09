@@ -45,6 +45,7 @@ export class Renderer {
       cam!.update(this.renderer, this.sceneManager.scene);
       // oct!.visible = true;
 
+      this.renderer.clearDepth();
       this.renderer.render(this.sceneManager.scene, this.sceneManager.camera);
     });
     this.setUpGsapAnimation();
@@ -85,6 +86,7 @@ export class Renderer {
       this.sceneManager.camera,
       this.renderer.domElement,
     );
+    // orbit.enableDamping = true; // nice effect
     orbit.addEventListener('change', () =>
       this.sceneManager.printCameraStats(),
     );
