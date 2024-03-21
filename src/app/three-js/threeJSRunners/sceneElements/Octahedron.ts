@@ -82,17 +82,14 @@ export class Octahedron implements SceneElement {
   }
 
   octReflectionMaterial() {
-    const m = new THREE.MeshPhysicalMaterial({
+    const m = new THREE.MeshPhongMaterial({
       color: 0xffffff,
       transparent: true,
       opacity: 0.8,
-      roughness: 0.8,
-      metalness: 0.9,
-      clearcoat: 1,
       emissive: 0xffffff,
+      shininess: 0.6,
       emissiveIntensity: 0.4,
-      transmission: 0.3,
-      ior: 2.4,
+      combine: THREE.AddOperation,
       envMap: this.cc.renderTarget.texture,
     });
 
